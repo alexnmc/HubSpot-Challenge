@@ -1,1 +1,1 @@
-# HubSpot-Challenge
+# HubSpot Challenge JavaScript solution

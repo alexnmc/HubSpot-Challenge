@@ -1,0 +1,22 @@
+{
+  "name": "hubspot-javascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hubSpot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexnmc/HubSpot-Challenge.git"
+  },
+  "author": "Alexander Nemechek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexnmc/HubSpot-Challenge/issues"
+  },
+  "homepage": "https://github.com/alexnmc/HubSpot-Challenge#readme",
+  "dependencies": {
+    "axios": "^0.24.0"
+  }
+}
