@@ -1,7 +1,7 @@
 const axios = require('axios')
 axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=3188ebf5095cfba8d35acc87415e')
 .then(res => {
-    const countryDates = res.data.partners.reduce((acc, partner) => {//finding all the valid consecutive dates from the partners and grouping them by country 
+    const countryDates = res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates from the partners and grouping them by country 
         partner.availableDates.forEach((date, index, elements) => {
             const date1 =  date.split('-')
             const year1 = date1[0]
@@ -23,7 +23,7 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
         return acc
     }, {})
 
-    const mostCommonDate = (arr) => { //finds the first (earliest) most common date 
+    const mostCommonDate = (arr) => { //finds the earliest most common date 
         return arr.reduce((acc, item)=> { 
         acc[item] ? acc[item]++ : acc[item] = 1
         if(acc[item] > acc.highestCount){
@@ -36,7 +36,7 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
 
     let final = {countries:[]}
    
-    for(let i in countryDates){ //finding the correct common date for each country
+    for(let i in countryDates){
         const targetDate = mostCommonDate(countryDates[i].consecutiveDates)
         let countryObject = {           
             attendeeCount: 0,
@@ -44,7 +44,7 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
             name: i,
             startDate: null
         }
-        countryDates[i].partners.map(item => { //finding the partners which are availlable on the target date
+        countryDates[i].partners.map(item => { //find the partners which are available on the target date
             if(item.availableDates.includes(targetDate[0]) && item.availableDates.includes(targetDate[1])){
                 countryObject.attendeeCount++
                 countryObject.attendees.push(item.email)
