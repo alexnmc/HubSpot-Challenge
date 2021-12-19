@@ -34,11 +34,10 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
         },{highestItem: arr[0], highestCount: 1}).highestItem
     }
 
-    let final = {countries:[]}
-   
+    const final = {countries:[]}
     for(let i in countryDates){
         const targetDate = mostCommonDate(countryDates[i].consecutiveDates)
-        let countryObject = {           
+        const countryObject = {           
             attendeeCount: 0,
             attendees: [],
             name: i,
@@ -53,7 +52,8 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
         })
         final.countries.push(countryObject)
  }
-    axios.post('https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=3188ebf5095cfba8d35acc87415e', final).then(res => console.log(res))
+    axios.post('https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=3188ebf5095cfba8d35acc87415e', final)
+    .then(res => console.log(res))
 })
 
 
