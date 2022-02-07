@@ -1,7 +1,7 @@
 const axios = require('axios')
 axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=3188ebf5095cfba8d35acc87415e')
 .then(res => {
-    const countryDates = res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates from the partners and grouping them by country 
+    const countryDates = res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates find the target date and group them by country 
         partner.availableDates.forEach((date, index, elements) => {
             const date1 =  date.split('-')
             const year1 = date1[0]
@@ -13,30 +13,24 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
             const day2 = nextDate && nextDate[2]
             if(year1 === year2 && month1 === month2 && day2 - day1 === 1){
                 if(acc[partner.country]) {
-                    acc[partner.country].consecutiveDates.push([date, elements[index+1]])
+                    acc[partner.country].consecutiveDates[date + elements[index+1]] ?  acc[partner.country].consecutiveDates[date + elements[index+1]]++ : acc[partner.country].consecutiveDates[date + elements[index+1]] = 1
                     !acc[partner.country].partners.includes(partner) && acc[partner.country].partners.push(partner)
+                    if(acc[partner.country].consecutiveDates[date + elements[index+1]] > acc[partner.country].maxCount){
+                        acc[partner.country].maxCount = acc[partner.country].consecutiveDates[date + elements[index+1]]
+                        acc[partner.country].targetDate = [date , elements[index+1]]
+                    }
                 }else{
-                    acc[partner.country] = {consecutiveDates: [[date, elements[index+1]]], partners: [partner]}
+                    acc[partner.country] = {consecutiveDates: {[date + elements[index+1]]: 1}, partners: [partner], targetDate: [date , elements[index+1]], maxCount: 1}
                 }
             }
         })
         return acc
     }, {})
 
-    const mostCommonDate = (arr) => { //finds the earliest most common date 
-        return arr.reduce((acc, item)=> { 
-        acc[item] ? acc[item]++ : acc[item] = 1
-        if(acc[item] > acc.highestCount){
-            acc.highestCount = acc[item]
-            acc.highestItem = item
-        }
-        return acc
-        },{highestItem: arr[0], highestCount: 1}).highestItem
-    }
-
+    
     const final = {countries:[]}
     for(let i in countryDates){
-        const targetDate = mostCommonDate(countryDates[i].consecutiveDates)
+        const targetDate = countryDates[i].targetDate
         const countryObject = {           
             attendeeCount: 0,
             attendees: [],
@@ -52,6 +46,7 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
         })
         final.countries.push(countryObject)
  }
+
     axios.post('https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=3188ebf5095cfba8d35acc87415e', final)
     .then(res => console.log(res))
 })
