@@ -13,14 +13,20 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
             const day2 = nextDate && nextDate[2]
             if(year1 === year2 && month1 === month2 && day2 - day1 === 1){
                 if(acc[partner.country]) {
-                    acc[partner.country].consecutiveDates[date + elements[index+1]] ?  acc[partner.country].consecutiveDates[date + elements[index+1]]++ : acc[partner.country].consecutiveDates[date + elements[index+1]] = 1
+                    acc[partner.country].consecutiveDates[date + elements[index+1]] ?  
+                    acc[partner.country].consecutiveDates[date + elements[index+1]]++ : 
+                    acc[partner.country].consecutiveDates[date + elements[index+1]] = 1
                     !acc[partner.country].partners.includes(partner) && acc[partner.country].partners.push(partner)
                     if(acc[partner.country].consecutiveDates[date + elements[index+1]] > acc[partner.country].maxCount){
                         acc[partner.country].maxCount = acc[partner.country].consecutiveDates[date + elements[index+1]]
                         acc[partner.country].targetDate = [date , elements[index+1]]
                     }
                 }else{
-                    acc[partner.country] = {consecutiveDates: {[date + elements[index+1]]: 1}, partners: [partner], targetDate: [date , elements[index+1]], maxCount: 1}
+                    acc[partner.country] = {
+                        consecutiveDates: {[date + elements[index+1]]: 1}, 
+                        partners: [partner], 
+                        targetDate: [date , elements[index+1]], 
+                        maxCount: 1}
                 }
             }
         })
