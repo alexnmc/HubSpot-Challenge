@@ -1,7 +1,8 @@
 const axios = require('axios')
 axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=3188ebf5095cfba8d35acc87415e')
 .then(res => {
-    const countryDates = res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates find the target date and group them by country 
+    let countries = {}
+    res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates find the target date and group them by country 
         partner.availableDates.forEach((date, index, elements) => {
             const date1 =  date.split('-')
             const year1 = date1[0]
@@ -16,42 +17,45 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
                     acc[partner.country].consecutiveDates[date + elements[index+1]] ?  
                     acc[partner.country].consecutiveDates[date + elements[index+1]]++ : 
                     acc[partner.country].consecutiveDates[date + elements[index+1]] = 1
-                    !acc[partner.country].partners.includes(partner) && acc[partner.country].partners.push(partner)
+                    !acc[partner.country].partners.includes(partner) 
+                    && partner.availableDates.includes(acc[partner.country].targetDate[0])
+                    && partner.availableDates.includes(acc[partner.country].targetDate[1])
+                    && acc[partner.country].partners.push(partner)
                     if(acc[partner.country].consecutiveDates[date + elements[index+1]] > acc[partner.country].maxCount){
                         acc[partner.country].maxCount = acc[partner.country].consecutiveDates[date + elements[index+1]]
                         acc[partner.country].targetDate = [date , elements[index+1]]
                     }
+                    let emails = acc[partner.country]["finalCountryObject" + [date , elements[index+1]]] ? 
+                    [...acc[partner.country]["finalCountryObject" + [date , elements[index+1]]].attendees, partner.email]:
+                    [partner.email]
+                    acc[partner.country]["finalCountryObject" + [date , elements[index+1]]] = {
+                        attendeeCount: acc[partner.country].partners.length,
+                        attendees:  emails,
+                        name: partner.country,
+                        startDate: acc[partner.country].targetDate[0]
+                    }
+                    countries[partner.country] = acc[partner.country]["finalCountryObject" +  acc[partner.country].targetDate]
                 }else{
                     acc[partner.country] = {
                         consecutiveDates: {[date + elements[index+1]]: 1}, 
-                        partners: [partner], 
+                        partners: partner.availableDates.includes(date) && partner.availableDates.includes(elements[index+1]) ? [partner] : [], 
                         targetDate: [date , elements[index+1]], 
-                        maxCount: 1}
+                        maxCount: 1,
+                        ["finalCountryObject" + [date , elements[index+1]]]: {
+                            attendeeCount: 1,
+                            attendees: [partner.email],
+                            name: partner.country,
+                            startDate: date
+                        }
+                    }
+                    countries[partner.country] = acc[partner.country]["finalCountryObject" +  acc[partner.country].targetDate]
                 }
             }
         })
         return acc
     }, {})
 
-    
-    const final = {countries:[]}
-    for(let i in countryDates){
-        const targetDate = countryDates[i].targetDate
-        const countryObject = {           
-            attendeeCount: 0,
-            attendees: [],
-            name: i,
-            startDate: null
-        }
-        countryDates[i].partners.map(item => { //find the partners which are available on the target date
-            if(item.availableDates.includes(targetDate[0]) && item.availableDates.includes(targetDate[1])){
-                countryObject.attendeeCount++
-                countryObject.attendees.push(item.email)
-                countryObject.startDate = targetDate[0]
-            }
-        })
-        final.countries.push(countryObject)
- }
+    const final = {countries: Object.values(countries)}
 
     axios.post('https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=3188ebf5095cfba8d35acc87415e', final)
     .then(res => console.log(res))
