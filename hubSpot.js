@@ -1,8 +1,8 @@
-const axios = require('axios')
-axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=3188ebf5095cfba8d35acc87415e')
-.then(res => {
+const data = require('./data/partners.json')
+const result = require('./data/result.json')
+
     let countries = {}
-    res.data.partners.reduce((acc, partner) => {//get all the valid consecutive dates find the target date and group them by country 
+    data.reduce((acc, partner) => {//get all the valid consecutive dates find the target date and group them by country 
         partner.availableDates.forEach((date, index, elements) => {
             const date1 =  date.split('-')
             const year1 = date1[0]
@@ -56,9 +56,10 @@ axios.get('https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKe
     }, {})
 
     const final = {countries: Object.values(countries)}
+    JSON.stringify(final) === JSON.stringify(result) ? console.log('Congratulations!') : console.log('Error')
 
-    axios.post('https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=3188ebf5095cfba8d35acc87415e', final)
-    .then(res => console.log(res))
-})
+
+   
+
 
 
